@@ -1,13 +1,9 @@
 import pandas as pd
 from splinter import Browser
 from bs4 import BeautifulSoup
-
-def init_browser():
-    executable_path = {'executable_path': 'chromedriver.exe'}
-    browser = Browser('chrome', **executable_path, headless=False)
+import time
 
 def scrape():
-    # browser = init_browser()
     executable_path = {'executable_path': 'chromedriver.exe'}
     browser = Browser('chrome', **executable_path, headless=False)
     mars_dict = {}
@@ -24,11 +20,12 @@ def scrape():
     # Step Two:
     browser.visit("https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars")
     browser.find_by_id('full_image').click()
+    time.sleep(1)
     html = browser.html
     soup = BeautifulSoup(html, "html.parser")
     results = soup.find_all('img', class_="fancybox-image")
     link = str(results)
-    # link = link.split("src=")[1]
+    link = link.split("src=")[1]
     link = link.split("style")[0]
     link = link.replace('"', "")
     link = link.replace(" ", "")
@@ -37,6 +34,7 @@ def scrape():
 
     # Step Three:
     browser.visit("https://twitter.com/marswxreport?lang=en")
+    time.sleep(1)
     browser.find_by_xpath("/html/body/div/div/div/div[2]/main/div/div/div/div/div/div/div/div/div[2]/section/div/div/div/div[1]/div/div/div/article/div/div[2]/div[2]/div[2]/div[1]/div/span").click()
     html = browser.html
     soup = BeautifulSoup(html, "html.parser")
@@ -70,10 +68,8 @@ def scrape():
         for result in results:
             link = result.find('a')['href']
             links.append(link)
-        hemisphere_dict = {"Title": title, "img_url": links[0]}
+        hemisphere_dict = {"title": title, "img_url": links[0]}
         hemisphere_list.append(hemisphere_dict)
         mars_dict["hemispheres"] = hemisphere_list
 
-        return mars_dict
-
-    
+    return mars_dict
